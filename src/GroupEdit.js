@@ -5,30 +5,38 @@ import AppNavbar from './AppNavbar';
 
 class GroupEdit extends Component
 {
-    emptyItem = {
+    emptyItem = 
+    {
         name: '',
         address: '',
         city: '',
-        stateOrProvince: '',
         country: '',
+        stateOrProvince: '',
         postalCode: ''
     };
 
-    constructor(props) {
+    constructor(props) 
+    {
         super(props);
-        this.state = {
+        this.state = 
+        {
             item: this.emptyItem
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    async componentDidMount() {
-        if (this.props.match.params.id !== 'new') {
+    async componentDidMount() 
+    {
+        if (this.props.match.params.id !== 'new') 
+        {
             const group = await (await fetch(`/api/group/${this.props.match.params.id}`)).json();
             this.setState({item: group});
         }
     }
+
+     // MAIN:
+    //--------------------------------------------------------------------------------------------------------
 
     handleChange(event)
     {
@@ -46,7 +54,7 @@ class GroupEdit extends Component
         const {item} = this.state;
 
         await fetch('/api/group',
-    {
+        {
             method: (item.id) ? 'PUT' : 'POST',
             headers:
             {
@@ -61,7 +69,8 @@ class GroupEdit extends Component
     // RENDER:
     //--------------------------------------------------------------------------------------------------------
 
-    render() {
+    render() 
+    {
         const {item} = this.state;
         const title = <h2>{item.id ? 'Edit Group' : 'Add Group'}</h2>;
 

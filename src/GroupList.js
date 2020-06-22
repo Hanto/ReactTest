@@ -21,11 +21,16 @@ class GroupList extends Component
             .then(data => this.setState({groups: data, isLoading: false}));
     }
 
+    // MAIN:
+    //--------------------------------------------------------------------------------------------------------
+
     async remove(id)
     {
-        await fetch(`/api/group/${id}`, {
+        await fetch(`/api/group/${id}`, 
+        {
             method: 'DELETE',
-            headers: {
+            headers: 
+            {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             }
@@ -39,26 +44,22 @@ class GroupList extends Component
     // RENDER:
     //--------------------------------------------------------------------------------------------------------
 
-    render()
+    renderEvent(event)
     {
-        const {groups, isLoading} = this.state;
+        const dateFormater = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit'});
+        const formatedDate = dateFormater.format(new Date(event.date));
+        
+        return <div key={event.id}>{formatedDate} : {event.title}</div>
+    }
 
-        if (isLoading) {
-            return <p>Loading...</p>;
-        }
-
-        const groupList = groups.map(group => {
-            const address = `${group.address || ''} ${group.city || ''} ${group.stateOrProvince || ''}`;
-            return <tr key={group.id}>
+    renderGroup(group)
+    {
+        const address = `${group.address || ''} ${group.city || ''} ${group.stateOrProvince || ''}`;
+        
+        return <tr key={group.id}>
                 <td style={{whiteSpace: 'nowrap'}}>{group.name}</td>
                 <td>{address}</td>
-                <td>{group.events.map(event => {
-                    return <div key={event.id}>{new Intl.DateTimeFormat('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: '2-digit'
-                    }).format(new Date(event.date))}: {event.title}</div>
-                })}</td>
+                <td>{group.events.map(event => this.renderEvent(event))}</td>
                 <td>
                     <ButtonGroup>
                         <Button size="sm" color="primary" tag={Link} to={"/groups/" + group.id}>Edit</Button>
@@ -66,7 +67,18 @@ class GroupList extends Component
                     </ButtonGroup>
                 </td>
             </tr>
-        });
+    }
+
+    render()
+    {
+        const {groups, isLoading} = this.state;
+
+        if (isLoading) 
+        {
+            return <p>Loading...</p>;
+        }
+
+        const groupList = groups.map(group => this.renderGroup(group))
 
         return (
             <div>
