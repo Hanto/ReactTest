@@ -1,9 +1,11 @@
 import React from 'react';
 import Select from 'react-select';
 import axios from 'axios';
+import { Button, ButtonGroup, Container, Table } from 'reactstrap';
+import AppNavbar from './AppNavbar';
 
 
-class FoodEdit extends React.Component 
+export default class FoodEdit extends React.Component 
 {
     state = 
     {
@@ -34,17 +36,31 @@ class FoodEdit extends React.Component
 
     renderList()
     {
-        return (this.state.data.map(data =>({label:data.name, value: data.name})));
+        return this.state.data
+            .sort((a, b) => a.name > b.name ? 1: -1)
+            .map(data =>({label:data.name, value: data.name}))
+            
     }
+
+    // RENDER:
+    //--------------------------------------------------------------------------------------------------------
 
     render () 
     {
         return (
-          <div>
-            <Select options={this.renderList()}/>
-          </div>
+            <div>
+                <AppNavbar/>
+                <Container flui>
+                    <Table className="mt">
+                    <thead>
+                        <tr>
+                            <th width="20%"><Select options={this.renderList()}/></th>
+                            <th width="20%"><Select options={this.renderList()}/></th>
+                        </tr>
+                        </thead>  
+                    </Table>
+                </Container>
+            </div>
         )
     }
 }
-
-export default FoodEdit;
