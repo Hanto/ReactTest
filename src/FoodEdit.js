@@ -12,21 +12,20 @@ class FoodEdit extends React.Component
 
     componentDidMount() 
     {
-        const data = this.getNutrients("%");
+        this.getNutrients("%");
     }
     
-    async getNutrients(searchTerm)
+    getNutrients(searchTerm)
     {
-        return axios.get('/api/nutrient/search', 
-        {   
-            params:
-            {
-                nutrient: searchTerm,
-                page: '1',
-                pagesize: '50'
-            }
-        })
-        .then(res => 
+        const params =
+        {
+            nutrient: searchTerm,
+            page: '1',
+            pagesize: '50'
+        }
+
+        return axios.get('/api/nutrient/search', { params })
+        .then(res =>
         {
             const data = res.data;
             this.setState({ data });
