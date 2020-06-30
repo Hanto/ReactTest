@@ -11,6 +11,9 @@ export default class AppNavbar extends Component
         this.toggle = this.toggle.bind(this);
     }
 
+     // MAIN:
+    //--------------------------------------------------------------------------------------------------------
+
     toggle()
     {
         this.setState({
@@ -29,8 +32,7 @@ export default class AppNavbar extends Component
             <Collapse isOpen={this.state.isOpen} navbar>
                 <Nav className="ml-auto" navbar>
                     <NavItem>
-                        <NavLink
-                            href="https://twitter.com/johancia">@oktadev</NavLink>
+                        <NavLink href="https://twitter.com/johancia">@Johancia</NavLink>
                     </NavItem>
                     <NavItem>
                         <NavLink href="https://github.com/oktadeveloper/okta-spring-boot-react-crud-example">GitHub</NavLink>
