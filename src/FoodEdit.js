@@ -1,28 +1,23 @@
 import React from 'react';
 import Select from 'react-select';
 import axios from 'axios';
-import { Button, ButtonGroup, Container, Table } from 'reactstrap';
+import { Container, Table, Button } from 'reactstrap';
 import AppNavbar from './AppNavbar';
-
-
-const options = 
-[
-    { value: 'chocolate', label: 'chocolate'},
-    { value: 'vanilla', label: 'vanilla'},
-    { value: 'lemon', label: 'lemon'},
-]
 
 export default class FoodEdit extends React.Component 
 {
     state = 
     {
         data: [],
-        selectedOption: []
+        food: [],
+        selectedOption: [],
+        selectedFood: [],
     }
 
     componentDidMount() 
-    {
-        this.getNutrients("%");
+    {   
+        this.getFood = this.getFood.bind(this);
+        this.getNutrients("%"); 
     }
     
     getNutrients(searchTerm)
@@ -39,31 +34,42 @@ export default class FoodEdit extends React.Component
         {
             const data = res.data
                 .sort((a, b) => a.name > b.name ? 1: -1)
-                .map(data =>({label:data.name, value: data.name}));
+                .map(data =>({label:data.name, value: data.id}));
             this.setState({ data });
         })
     }
 
-    renderList()
+    getFood()
     {
-        return this.state.data
-            .sort((a, b) => a.name > b.name ? 1: -1)
-            .map(data =>({label:data.name, value: data.name}))
-            
-    }
+        const params =
+        {
+            nutrient: "%Protein%",
+            page: '1',
+            pagesize: '50'
+        }
 
-    getOption()
+        return axios.get('/api/food/search', { params })
+        .then(res =>
+        {
+            const food = res.data
+                .sort((a, b) => a.description > b.description ? 1: -1)
+                .map(data =>({label:data.description, value: data.fdcId}));
+            this.setState({ food });
+        })
+    }  
+
+    getOptions()
     {   
-        if (this.state.selectedOption != null)
-            return this.state.selectedOption.map(option => option.value + " "); 
-        else return "Nothing";
+        return this.state.selectedOption != null ? 
+            this.state.selectedOption.map(option => option.label + "(" + option.value + ") ") : 
+            "Nothing";
     }
 
-    handleChange = selectedOption =>
+    handleChange(selectedOption)
     {
-        this.setState( 
-            { selectedOption }, 
-            () => console.log("Option selected:", this.state.selectedOption));
+        this.setState({selectedOption});
+        console.log("Option selected:", this.state.selectedOption);
+        this.getFood();
     }
 
     // RENDER:
@@ -72,6 +78,7 @@ export default class FoodEdit extends React.Component
     render () 
     {
         const { selectedOption } = this.state;
+        const { selectedFood } = this.state;
 
         return (
             <div>
@@ -81,14 +88,30 @@ export default class FoodEdit extends React.Component
                     <thead>
                         <tr>
                             <th>
-                                <pre>Selected Nutriens: {this.getOption()}</pre>
+                            <pre>Selected Nutriens: {this.getOptions()}</pre>
                             </th>
-                            <th width="50%">
+                            <th>
+                            <pre>Selected Food: </pre>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th width="100%">
                                 <Select 
                                     isMulti
                                     value={selectedOption}
-                                    onChange={this.handleChange}
-                                    options={this.state.data}/></th>
+                                    onChange={event => this.handleChange(event)}
+                                    options={this.state.data}/>
+                            </th>
+                            <th>
+                            <Button color="danger" onClick={this.getFood}>Food</Button>
+                            </th>
+                        </tr>
+                        <tr>
+                        <Select 
+                                    isMulti
+                                    value={selectedFood}
+                                    //onChange={event => this.handleChange(event)}
+                                    options={this.state.food}/>
                         </tr>
                         </thead>  
                     </Table>
