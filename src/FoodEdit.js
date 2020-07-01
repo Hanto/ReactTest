@@ -5,11 +5,19 @@ import { Button, ButtonGroup, Container, Table } from 'reactstrap';
 import AppNavbar from './AppNavbar';
 
 
+const options = 
+[
+    { value: 'chocolate', label: 'chocolate'},
+    { value: 'vanilla', label: 'vanilla'},
+    { value: 'lemon', label: 'lemon'},
+]
+
 export default class FoodEdit extends React.Component 
 {
     state = 
     {
-        data: []
+        data: [],
+        selectedOption: []
     }
 
     componentDidMount() 
@@ -29,7 +37,9 @@ export default class FoodEdit extends React.Component
         return axios.get('/api/nutrient/search', { params })
         .then(res =>
         {
-            const data = res.data;
+            const data = res.data
+                .sort((a, b) => a.name > b.name ? 1: -1)
+                .map(data =>({label:data.name, value: data.name}));
             this.setState({ data });
         })
     }
@@ -42,11 +52,27 @@ export default class FoodEdit extends React.Component
             
     }
 
+    getOption()
+    {   
+        if (this.state.selectedOption != null)
+            return this.state.selectedOption.map(option => option.value + " "); 
+        else return "Nothing";
+    }
+
+    handleChange = selectedOption =>
+    {
+        this.setState( 
+            { selectedOption }, 
+            () => console.log("Option selected:", this.state.selectedOption));
+    }
+
     // RENDER:
     //--------------------------------------------------------------------------------------------------------
 
     render () 
     {
+        const { selectedOption } = this.state;
+
         return (
             <div>
                 <AppNavbar/>
@@ -54,8 +80,15 @@ export default class FoodEdit extends React.Component
                     <Table className="mt">
                     <thead>
                         <tr>
-                            <th width="20%"><Select options={this.renderList()}/></th>
-                            <th width="20%"><Select options={this.renderList()}/></th>
+                            <th>
+                                <pre>Selected Nutriens: {this.getOption()}</pre>
+                            </th>
+                            <th width="50%">
+                                <Select 
+                                    isMulti
+                                    value={selectedOption}
+                                    onChange={this.handleChange}
+                                    options={this.state.data}/></th>
                         </tr>
                         </thead>  
                     </Table>
