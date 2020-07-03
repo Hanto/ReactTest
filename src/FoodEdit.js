@@ -11,7 +11,7 @@ export default class FoodEdit extends React.Component
         data: [],
         food: [],
         selectedOption: [],
-        selectedFood: [],
+        selectedFood: null,
     }
 
     componentDidMount() 
@@ -39,24 +39,40 @@ export default class FoodEdit extends React.Component
         })
     }
 
-    getFood()
+    getFood(selectedOption)
     {
+        if (selectedOption == null)
+        {
+            this.setState({food: null})
+            return;
+        }
+
         const params =
         {
-            nutrient: "%Protein%",
+            nutrients: selectedOption.map(option => option.value).join(','),
             page: '1',
             pagesize: '50'
         }
 
-        return axios.get('/api/food/search', { params })
+        return axios.get('/api/food/search2', { params })
         .then(res =>
         {
             const food = res.data
                 .sort((a, b) => a.description > b.description ? 1: -1)
-                .map(data =>({label:data.description, value: data.fdcId}));
+                .map(data =>({label:data.description, value: data.fdcId, food: data}));
             this.setState({ food });
         })
     }  
+
+    handleChange(selectedOption)
+    {
+        this.setState({selectedOption});
+        console.log("Option selected:", this.state.selectedOption);
+        this.getFood(selectedOption);
+    }
+
+    handleFoodChange(selectedFood)
+    {   this.setState({selectedFood}); }
 
     getOptions()
     {   
@@ -65,20 +81,41 @@ export default class FoodEdit extends React.Component
             "Nothing";
     }
 
-    handleChange(selectedOption)
-    {
-        this.setState({selectedOption});
-        console.log("Option selected:", this.state.selectedOption);
-        this.getFood();
-    }
-
     // RENDER:
     //--------------------------------------------------------------------------------------------------------
+
+    renderNutrient(foodNutrient)
+    {
+        return(<tr>
+            <td>Nutrient: {foodNutrient.name}</td>
+            <td>Amount: {foodNutrient.amount} {foodNutrient.unitName}</td></tr>
+        )
+    }
+
+    renderNutrients(foodNutrients)
+    {
+        return foodNutrients
+            .sort((a, b) => a.amount > b.amount ? -1 : 1)
+            .map(foodNutrient => this.renderNutrient(foodNutrient));
+    }
+
+    renderFood(selectedFood)
+    {
+        if (selectedFood != null)
+        return(
+        <Container>
+            <pr>Name: {selectedFood.label} </pr>
+            <pr>ID: {selectedFood.value} </pr>
+            <div>Nutriens: {this.renderNutrients(selectedFood.food.foodNutrients)}</div>
+        </Container>);
+        else return null;
+    }
 
     render () 
     {
         const { selectedOption } = this.state;
         const { selectedFood } = this.state;
+        const food = this.renderFood(this.state.selectedFood);
 
         return (
             <div>
@@ -103,20 +140,21 @@ export default class FoodEdit extends React.Component
                                     options={this.state.data}/>
                             </th>
                             <th>
-                            <Button color="danger" onClick={this.getFood}>Food</Button>
+                            <Button color="danger" onClick={this.state.food}>Food</Button>
                             </th>
                         </tr>
                         <tr>
                         <Select 
-                                    isMulti
+                                    //isMulti
                                     value={selectedFood}
-                                    //onChange={event => this.handleChange(event)}
+                                    onChange={event => this.handleFoodChange(event)}
                                     options={this.state.food}/>
                         </tr>
                         </thead>  
                     </Table>
                 </Container>
+                {food}
             </div>
-        )
+        );
     }
 }
