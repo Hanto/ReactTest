@@ -1,0 +1,9 @@
+.NutrientNameSelected
+{
+    font-weight: bold;
+}
+
+.NutrientNameNotSelected
+{
+    font-weight: normal;
+}
